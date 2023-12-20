@@ -1,27 +1,83 @@
-<!doctype html>
-<html lang="en-US">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width" />
-    <title>Schnitzelchens Test Seite</title>
-  </head>
-  <body>
-    <h4>First ever Title</h4>
-    
-    <img src="https://imgs.search.brave.com/KyJaymxDIFHNwY_fk7heC4FQoPdu7kzvGOCl7C_LyNg/rs:fit:500:0:0/g:ce/aHR0cHM6Ly9tZWRp/YS5pc3RvY2twaG90/by5jb20vaWQvNDkw/NzI5ODcwL3Bob3Rv/L2JsYWNrLWxlYXRo/ZXItdGV4dHVyZS5q/cGc_cz02MTJ4NjEy/Jnc9MCZrPTIwJmM9/TVRCTFU3SmpjNnl3/RnhVRkxQRUpJMXFU/VWQ1dG5FZ2VGTlND/blJWQUtiUT0" alt="test" />
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sternenhintergrund mit Mausinteraktion</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: black;
+        }
 
-    <a href="https://youtube.com/">     
+        .star {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            background: white;
+            animation: twinkle 5s infinite;
+        }
 
-        Youtube
+        @keyframes twinkle {
+            0% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const numberOfStars = 200;
+            const body = document.body;
 
-    </a>
-    <p>Following, a list of a lotta tests</p>
-    <ol>
+            for (let i = 0; i < numberOfStars; i++) {
+                createStar();
+            }
 
-        <li>test</li>
-        <li>More Test</li>
-        <li>And even more of this test thingy</li>
+            function createStar() {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + 'vw';
+                star.style.top = Math.random() * 100 + 'vh';
+                body.appendChild(star);
+            }
 
-    </ol>
-  </body>
+            document.addEventListener('mousemove', function(event) {
+                const mouseX = event.clientX;
+                const mouseY = event.clientY;
+
+                const stars = document.querySelectorAll('.star');
+
+                stars.forEach(function(star) {
+                    const starX = star.offsetLeft + star.offsetWidth / 2;
+                    const starY = star.offsetTop + star.offsetHeight / 2;
+
+                    const deltaX = mouseX - starX;
+                    const deltaY = mouseY - starY;
+
+                    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+
+                    if (distance < 100) {
+                        const angle = Math.atan2(deltaY, deltaX);
+                        const speed = 100 / distance;
+
+                        const moveX = Math.cos(angle) * speed;
+                        const moveY = Math.sin(angle) * speed;
+
+                        star.style.left = star.offsetLeft - moveX + 'px';
+                        star.style.top = star.offsetTop - moveY + 'px';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
 </html>
