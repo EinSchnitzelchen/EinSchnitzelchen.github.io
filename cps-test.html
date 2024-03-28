@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CPS Tester</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+  }
+  #cpsDisplay {
+    font-size: 24px;
+    margin-top: 20px;
+  }
+  #clickArea {
+    width: 300px;
+    height: 200px;
+    background-color: lightgray;
+    margin: 0 auto;
+    margin-top: 20px;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+<h1>CPS Tester</h1>
+<p>Klicke innerhalb des grauen Bereichs, um deine CPS zu testen.</p>
+<div id="clickArea" onclick="startTest()">
+  <p style="padding-top: 80px;">Start</p>
+</div>
+<p id="cpsDisplay"></p>
+
+<script>
+  let clicks = 0;
+  let startTime;
+
+  function startTest() {
+    clicks = 0;
+    document.getElementById('cpsDisplay').innerText = '';
+    document.getElementById('clickArea').innerHTML = '<p style="padding-top: 80px;">Klicke!</p>';
+    document.getElementById('clickArea').style.backgroundColor = 'white';
+    document.body.style.cursor = 'pointer';
+    startTime = Date.now();
+    document.getElementById('clickArea').addEventListener('click', countClicks);
+    setTimeout(stopTest, 1000);
+  }
+
+  function countClicks() {
+    clicks++;
+  }
+
+  function stopTest() {
+    document.getElementById('clickArea').removeEventListener('click', countClicks);
+    const endTime = Date.now();
+    const elapsedTime = (endTime - startTime) / 1000;
+    const cps = clicks / elapsedTime;
+    document.getElementById('cpsDisplay').innerText = `Deine CPS: ${cps.toFixed(2)}`;
+    document.getElementById('clickArea').innerHTML = '<p style="padding-top: 80px;">Start</p>';
+    document.getElementById('clickArea').style.backgroundColor = 'lightgray';
+    document.body.style.cursor = 'default';
+  }
+</script>
+</body>
+</html>

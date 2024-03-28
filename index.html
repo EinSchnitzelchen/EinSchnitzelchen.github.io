@@ -1,83 +1,48 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sternenhintergrund mit Mausinteraktion</title>
+    <title>Schnitzel Site</title>
     <style>
         body {
+            font-family: Arial, sans-serif;
             margin: 0;
-            overflow: hidden;
-            background: black;
+            padding: 0;
         }
-
-        .star {
-            position: absolute;
-            width: 1px;
-            height: 1px;
-            background: white;
-            animation: twinkle 5s infinite;
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
         }
-
-        @keyframes twinkle {
-            0% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 0;
-            }
-            100% {
-                opacity: 1;
-            }
+        nav {
+            text-align: center;
+            margin-top: 20px;
+        }
+        nav a {
+            text-decoration: none;
+            color: #333;
+            background-color: #f4f4f4;
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin: 5px;
+            display: inline-block;
+        }
+        nav a:hover {
+            background-color: #ddd;
         }
     </style>
 </head>
 <body>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const numberOfStars = 200;
-            const body = document.body;
-
-            for (let i = 0; i < numberOfStars; i++) {
-                createStar();
-            }
-
-            function createStar() {
-                const star = document.createElement('div');
-                star.className = 'star';
-                star.style.left = Math.random() * 100 + 'vw';
-                star.style.top = Math.random() * 100 + 'vh';
-                body.appendChild(star);
-            }
-
-            document.addEventListener('mousemove', function(event) {
-                const mouseX = event.clientX;
-                const mouseY = event.clientY;
-
-                const stars = document.querySelectorAll('.star');
-
-                stars.forEach(function(star) {
-                    const starX = star.offsetLeft + star.offsetWidth / 2;
-                    const starY = star.offsetTop + star.offsetHeight / 2;
-
-                    const deltaX = mouseX - starX;
-                    const deltaY = mouseY - starY;
-
-                    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-
-                    if (distance < 100) {
-                        const angle = Math.atan2(deltaY, deltaX);
-                        const speed = 100 / distance;
-
-                        const moveX = Math.cos(angle) * speed;
-                        const moveY = Math.sin(angle) * speed;
-
-                        star.style.left = star.offsetLeft - moveX + 'px';
-                        star.style.top = star.offsetTop - moveY + 'px';
-                    }
-                });
-            });
-        });
-    </script>
+    <header>
+        <h1>Schnitzel Site</h1>
+    </header>
+    <nav>
+        <a href="cps-test.html">Spiel 1</a>
+        <a href="spiel2.html">Spiel 2</a>
+        <a href="spiel3.html">Spiel 3</a>
+        <!-- Füge hier weitere Spiele hinzu -->
+    </nav>
 </body>
 </html>
