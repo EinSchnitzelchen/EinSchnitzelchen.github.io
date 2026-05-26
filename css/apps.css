@@ -34,10 +34,18 @@ textarea.editor { width:100%; height:100%; resize:none; background: transparent;
 .tab { padding: .65rem 1rem; border-radius: .9rem .9rem 0 0; background: rgba(255,255,255,.05); font-size: var(--text-xs); }
 .tab.active { background: rgba(255,255,255,.12); }
 .browser-bar { display:flex; align-items:center; gap:.5rem; padding: .7rem .9rem; border-bottom:1px solid var(--color-divider); }
-.address { flex:1; min-height:2.6rem; border-radius: .9rem; border:1px solid var(--color-border); background: rgba(255,255,255,.05); display:flex; align-items:center; padding: 0 .9rem; font-size: var(--text-sm); color: var(--color-text-muted); }
-.browser-page { padding: var(--space-4); display:grid; gap: var(--space-4); align-content:start; }
+.address-bar { flex:1; display:flex; }
+.address-input { flex:1; min-height:2.6rem; border-radius: .9rem; border:1px solid var(--color-border); background: rgba(255,255,255,.05); color: var(--color-text); padding: 0 .9rem; font-size: var(--text-sm); outline: none; }
+.address-input:focus { background: rgba(255,255,255,.1); }
+.browser-page { padding: var(--space-4); display:flex; flex-direction:column; gap: var(--space-4); min-height:0; height:100%; }
+.browser-start.hidden { display:none; }
+.browser-view { display:flex; flex:1; min-height:0; }
+.browser-view.hidden { display:none; }
+.browser-iframe { flex:1; width:100%; border:0; border-radius: 1.2rem; background: white; min-height:0; }
+.browser-bar .toolbar-btn:disabled { opacity: .4; cursor: not-allowed; }
 .article-grid { display:grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: var(--space-3); }
-.article-card { padding: 1rem; border-radius: 1rem; background: rgba(255,255,255,.05); border:1px solid var(--color-border); }
+.article-card { padding: 1rem; border-radius: 1rem; background: rgba(255,255,255,.05); border:1px solid var(--color-border); cursor: pointer; }
+.article-card:hover { background: rgba(255,255,255,.08); }
 .terminal { display:grid; grid-template-rows: 1fr auto; height:100%; background: rgba(1,6,14,.82); color: #d7f0ff; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .92rem; }
 .terminal-output { padding: 1rem; overflow:auto; white-space: pre-wrap; line-height: 1.6; }
 .terminal-inputbar { display:flex; gap:.5rem; align-items:center; padding: .8rem 1rem; border-top:1px solid rgba(255,255,255,.08); }

@@ -22,7 +22,87 @@ export function wireAppInternals(win) {
     initializeExplorer(win);
   }
   if (app === 'browser') {
-    win.querySelectorAll('.article-card').forEach(card => card.addEventListener('click', () => notify('Microsoft Edge', 'Artikel geöffnet: ' + card.querySelector('strong').textContent)));
+    const addressForm = win.querySelector('.address-bar');
+    const addressInput = win.querySelector('.address-input');
+    const openUrlBtn = win.querySelector('.open-url');
+    const backBtn = win.querySelector('.nav-back');
+    const forwardBtn = win.querySelector('.nav-forward');
+    const refreshBtn = win.querySelector('.refresh');
+    const browserStart = win.querySelector('.browser-start');
+    const browserView = win.querySelector('.browser-view');
+    const browserIframe = win.querySelector('.browser-iframe');
+
+    const history = [];
+    let historyIndex = -1;
+
+    const normalizeUrl = value => {
+      const input = String(value || '').trim();
+      if (!input) return 'https://www.bing.com';
+      if (/^https?:\/\//i.test(input)) return input;
+      if (input.includes(' ') || !input.includes('.')) return `https://www.bing.com/search?q=${encodeURIComponent(input)}`;
+      return `https://${input}`;
+    };
+
+    const updateNavigation = () => {
+      backBtn.disabled = historyIndex <= 0;
+      forwardBtn.disabled = historyIndex >= history.length - 1;
+    };
+
+    const loadUrl = (rawValue, push = true) => {
+      const url = normalizeUrl(rawValue);
+      addressInput.value = url;
+      if (push) {
+        history.splice(historyIndex + 1);
+        history.push(url);
+        historyIndex = history.length - 1;
+      }
+      browserIframe.src = url;
+      browserStart.classList.add('hidden');
+      browserView.classList.remove('hidden');
+      updateNavigation();
+    };
+
+    const loadHistory = offset => {
+      const nextIndex = historyIndex + offset;
+      if (nextIndex < 0 || nextIndex >= history.length) return;
+      historyIndex = nextIndex;
+      const url = history[historyIndex];
+      addressInput.value = url;
+      browserIframe.src = url;
+      updateNavigation();
+    };
+
+    addressForm.addEventListener('submit', e => {
+      e.preventDefault();
+      loadUrl(addressInput.value);
+    });
+
+    openUrlBtn.addEventListener('click', () => loadUrl(addressInput.value));
+    refreshBtn.addEventListener('click', () => {
+      if (!browserView.classList.contains('hidden')) {
+        browserIframe.src = browserIframe.src;
+      }
+    });
+    backBtn.addEventListener('click', () => loadHistory(-1));
+    forwardBtn.addEventListener('click', () => loadHistory(1));
+
+    browserIframe.addEventListener('load', () => {
+      try {
+        const doc = browserIframe.contentDocument;
+        if (!doc) return;
+        const base = doc.querySelector('base') || doc.createElement('base');
+        base.target = '_self';
+        if (!base.parentNode && doc.head) doc.head.prepend(base);
+        doc.querySelectorAll('a[target="_blank"]').forEach(link => link.removeAttribute('target'));
+      } catch (error) {
+        // Cross-origin pages können nicht umgeschrieben werden.
+      }
+    });
+
+    win.querySelectorAll('.article-card').forEach(card => {
+      const href = card.dataset.href || 'https://www.bing.com';
+      card.addEventListener('click', () => loadUrl(href));
+    });
   }
 }
 
@@ -101,7 +181,10 @@ function setupTerminal(win) {
 
  Welcome! Type "help" to see available commands.
  Type "about" for more information about this portfolio.
- Type "projects" to view featured projects.`;
+ Type "projects" to view featured projects.
+ 
+ ═══════════════════════════════════════════════════════════════
+ `;
 
   // Typewriter effect
   let charIndex = 0;
