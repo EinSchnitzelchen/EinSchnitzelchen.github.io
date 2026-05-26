@@ -67,23 +67,40 @@ export function focusWindow(win) {
 function attachWindowEvents(win) {
   const header = win.querySelector('.window-header');
   let drag = null;
+
+  const restoreSnappedWindow = () => {
+    if (!win.classList.contains('snapped-left') && !win.classList.contains('snapped-right') && !win.classList.contains('snapped-top')) return;
+    const rect = win.getBoundingClientRect();
+    win.classList.remove('snapped-left', 'snapped-right', 'snapped-top');
+    Object.assign(win.style, {
+      left: `${rect.left}px`,
+      top: `${Math.max(0, rect.top)}px`,
+      width: `${rect.width}px`,
+      height: `${rect.height}px`
+    });
+  };
+
   header.addEventListener('pointerdown', e => {
     if (e.target.closest('.window-controls')) return;
     if (win.classList.contains('maximized')) return;
     focusWindow(win);
+    restoreSnappedWindow();
     drag = { x: e.clientX, y: e.clientY, left: parseFloat(win.style.left), top: parseFloat(win.style.top) };
     dom.snapOverlay.classList.add('active');
+    updateSnapPreview(e.clientX, e.clientY);
     header.setPointerCapture(e.pointerId);
   });
   header.addEventListener('pointermove', e => {
     if (!drag) return;
     win.style.left = drag.left + (e.clientX - drag.x) + 'px';
     win.style.top = Math.max(0, drag.top + (e.clientY - drag.y)) + 'px';
+    updateSnapPreview(e.clientX, e.clientY);
   });
   header.addEventListener('pointerup', e => {
     if (!drag) return;
     const zone = getSnapZone(e.clientX, e.clientY);
     dom.snapOverlay.classList.remove('active');
+    updateSnapPreview();
     if (zone) applySnap(win, zone);
     drag = null;
   });
@@ -138,13 +155,32 @@ function toggleMaximize(win) {
   }
 }
 
+function setSnapZoneActive(zone) {
+  if (!dom.snapOverlay) return;
+  dom.snapOverlay.querySelectorAll('.snap-zone').forEach(el => {
+    el.classList.toggle('active', el.classList.contains(zone));
+  });
+}
+
+function updateSnapPreview(x, y) {
+  if (!dom.snapOverlay) return;
+  if (typeof x === 'undefined' || typeof y === 'undefined') {
+    dom.snapOverlay.classList.remove('active');
+    setSnapZoneActive('');
+    return;
+  }
+  const zone = getSnapZone(x, y);
+  dom.snapOverlay.classList.toggle('active', Boolean(zone));
+  setSnapZoneActive(zone);
+}
+
 function getSnapZone(x, y) {
   const w = window.innerWidth;
   const h = window.innerHeight - parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--taskbar-height'));
-  if (y < 60) return 'max';
-  if (x < w * 0.18) return 'left';
-  if (x > w * 0.82) return 'right';
-  if (y < h * 0.18) return 'top';
+  if (y < 40) return 'max';
+  if (x < w * 0.12) return 'left';
+  if (x > w * 0.88) return 'right';
+  if (y < h * 0.12) return 'top';
   return null;
 }
 

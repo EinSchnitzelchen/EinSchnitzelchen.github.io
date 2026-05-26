@@ -18,6 +18,4 @@ initPanels();
 initSelectionBox();
 initInteractions();
 initDesktopIcons();
-openApp('explorer');
-openApp('widgets');
-notify('Windows Web', 'Die modulare Desktop-Umgebung ist bereit.');
+openApp('terminal');

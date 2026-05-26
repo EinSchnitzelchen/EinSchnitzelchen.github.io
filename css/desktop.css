@@ -2,7 +2,7 @@
 .desktop-shell::before,.desktop-shell::after { content: ''; position: absolute; inset: 0; pointer-events: none; }
 .desktop-shell::before { background: radial-gradient(circle at 55% 15%, rgba(255,255,255,0.18), transparent 18%), radial-gradient(circle at 20% 70%, rgba(255,255,255,0.07), transparent 22%); mix-blend-mode: screen; }
 .desktop-shell::after { background: linear-gradient(to bottom, rgba(255,255,255,0.06), transparent 20%, rgba(0,0,0,0.22)); }
-.desktop-icons { position: absolute; top: var(--space-6); left: var(--space-5); display: block; z-index: 10; }
+.desktop-icons { position: absolute; top: var(--space-6); left: var(--space-5); display: block; z-index: 0; }
 .desktop-icon { position: absolute; width: 6rem; min-height: 5.8rem; display: grid; justify-items: center; gap: var(--space-2); padding: var(--space-2); border-radius: var(--radius-lg); color: white; text-shadow: 0 1px 6px rgba(0,0,0,.32); transition: background var(--transition), transform var(--transition), box-shadow var(--transition); cursor: move; }
 .desktop-icon:hover { background: rgba(255,255,255,0.16); transform: translateY(-1px); }
 .desktop-icon.selected { background: rgba(255,255,255,0.24); box-shadow: inset 0 0 0 2px rgba(255,255,255,0.4); border-radius: var(--radius-lg); }
@@ -46,9 +46,10 @@
 .context-menu { position:absolute; z-index:30; width: 15rem; padding: .45rem; border-radius: 1rem; border:1px solid var(--color-border); background: var(--color-surface-2); box-shadow: var(--shadow-lg); backdrop-filter: blur(24px); display:none; }
 .context-menu.open { display:block; }
 .context-sep { height:1px; background: var(--color-divider); margin: .35rem 0; }
-.snap-overlay { position:absolute; inset:0; pointer-events:none; z-index: 19; opacity:0; transition: opacity var(--transition); background: rgba(0,0,0,.08); }
+.snap-overlay { position:absolute; inset:0; pointer-events:none; z-index: 19; opacity:0; transition: opacity var(--transition); }
 .snap-overlay.active { opacity:1; }
-.snap-zone { position:absolute; border:1px dashed rgba(255,255,255,.3); background: rgba(120,180,255,.16); }
+.snap-zone { position:absolute; opacity:0; transition: opacity var(--transition), background var(--transition), border-color var(--transition); border:1px solid rgba(255,255,255,.72); background: rgba(255,255,255,.12); backdrop-filter: blur(4px); }
+.snap-zone.active { opacity:1; }
 .snap-zone.left { inset: 0 50% 0 0; }
 .snap-zone.right { inset: 0 0 0 50%; }
 .snap-zone.top { inset: 0 0 50% 0; }
