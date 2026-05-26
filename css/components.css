@@ -1,0 +1,35 @@
+.chip, .toolbar-btn, .menu-item, .quick-toggle, .start-app, .rec-card, .context-item {
+  border: 1px solid transparent;
+  transition: background var(--transition), border-color var(--transition), transform var(--transition), color var(--transition);
+}
+.toolbar-btn, .chip { min-height: 2.35rem; padding: 0 .9rem; border-radius: .8rem; background: rgba(255,255,255,.05); display:inline-flex; align-items:center; gap:.55rem; font-size: var(--text-sm); }
+.toolbar-btn:hover, .chip:hover { background: rgba(255,255,255,.1); border-color: var(--color-border); }
+.toolbar-btn.primary, .quick-toggle.active, .theme-tile.active { background: linear-gradient(180deg, color-mix(in srgb, var(--color-primary) 90%, white 10%), var(--color-primary)); color: white; }
+.toolbar-btn svg, .chip svg, .quick-toggle svg, .menu-item svg, .taskbar-button svg, .theme-tile svg { width: 1rem; height: 1rem; }
+.start-app { padding: .8rem .7rem; border-radius: 1rem; background: rgba(255,255,255,.04); display:grid; justify-items:center; gap: .45rem; text-align:center; min-height: 5.5rem; }
+.start-app:hover, .rec-card:hover, .menu-item:hover, .context-item:hover { background: rgba(255,255,255,.08); border-color: var(--color-border); }
+.start-app span, .rec-card p, .menu-item span { font-size: var(--text-xs); }
+.app-icon { width: 2.25rem; height: 2.25rem; border-radius: .75rem; display:grid; place-items:center; background: linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.04)); color: white; box-shadow: inset 0 1px 0 rgba(255,255,255,.18); }
+.quick-toggle { min-height: 4.75rem; border-radius: 1rem; background: rgba(255,255,255,.04); display:grid; place-items:center; gap:.4rem; padding:.6rem; font-size:var(--text-xs); }
+.widget, .weather-card, .notif-card, .settings-card, .file-card, .kpi, .calendar-tile, .theme-tile { background: var(--widget-bg); border:1px solid var(--color-border); border-radius: 1rem; box-shadow: var(--shadow-sm); }
+.notif-card { padding: 1rem; }
+.notif-card h4 { font-size: var(--text-sm); margin-bottom: .2rem; }
+.notif-card p { color: var(--color-text-muted); font-size: var(--text-xs); line-height: 1.5; }
+.title-btn { width: 2.75rem; height: 2.25rem; display:grid; place-items:center; border-radius: .7rem; color: var(--color-text-muted); transition: background var(--transition), color var(--transition); }
+.title-btn:hover { background: rgba(255,255,255,0.1); color: var(--color-text); }
+.title-btn.close:hover { background: #d94156; color: white; }
+.window-toolbar { display:flex; align-items:center; justify-content:space-between; gap: var(--space-3); padding: var(--space-3) var(--space-4); border-bottom: 1px solid var(--color-divider); background: rgba(255,255,255,0.03); position: sticky; top: 0; z-index: 2; backdrop-filter: blur(12px); }
+.toolbar-group { display:flex; align-items:center; gap: var(--space-2); flex-wrap: wrap; }
+.context-item { min-height: 2.5rem; padding: 0 .85rem; border-radius: .8rem; display:flex; align-items:center; justify-content:space-between; font-size: var(--text-sm); }
+input[type="range"] { width:100%; accent-color: var(--color-primary); }
+.theme-grid { display:grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: .75rem; }
+.theme-tile { padding: .75rem; border-radius: .9rem; display:grid; gap:.45rem; }
+.theme-preview { height: 4rem; border-radius: .8rem; background: linear-gradient(135deg, #0f1728, #28467f); }
+.theme-tile.light .theme-preview { background: linear-gradient(135deg, #dbeafe, #8dbdff); }
+.theme-tile.sunset .theme-preview { background: linear-gradient(135deg, #281329, #ff7e5f); }
+.switch { width: 2.8rem; height: 1.55rem; border-radius:999px; background: rgba(255,255,255,.14); position:relative; }
+.switch::after { content:''; position:absolute; top:.17rem; left:.17rem; width:1.2rem; height:1.2rem; border-radius:999px; background:white; transition: transform var(--transition); }
+.switch.on { background: var(--color-primary); }
+.switch.on::after { transform: translateX(1.24rem); }
+.hero-banner { padding: 1.25rem; border-radius: 1.25rem; background: linear-gradient(135deg, rgba(77,162,255,.28), rgba(127,198,255,.08)); border:1px solid rgba(127,198,255,.2); }
+.hero-banner h2 { font-size: var(--text-lg); margin-bottom: .45rem; }

@@ -1,0 +1,23 @@
+import { initTheme } from './theme.js';
+import { initClock } from './clock.js';
+import { bootTaskbar } from './taskbar.js';
+import { renderPinned, renderQuick, renderNotifications, initPanels } from './panels.js';
+import { initSelectionBox } from './selection.js';
+import { initInteractions } from './interactions.js';
+import { initDesktopIcons } from './desktop-icons.js';
+import { openApp } from './window-manager.js';
+import { notify } from './utils.js';
+
+initTheme();
+initClock();
+bootTaskbar();
+renderPinned();
+renderQuick();
+renderNotifications();
+initPanels();
+initSelectionBox();
+initInteractions();
+initDesktopIcons();
+openApp('explorer');
+openApp('widgets');
+notify('Windows Web', 'Die modulare Desktop-Umgebung ist bereit.');
