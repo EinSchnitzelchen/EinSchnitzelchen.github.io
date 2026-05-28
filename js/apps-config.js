@@ -1,5 +1,5 @@
 import { ICONS } from './icons.js';
-import { renderExplorer, renderSettings, renderNotes, renderCalc, renderBrowser, renderTerminal, renderWidgets, renderRecycle, renderPaint } from './renderers.js';
+import { renderExplorer, renderSettings, renderNotes, renderCalc, renderBrowser, renderTerminal, renderWidgets, renderRecycle, renderPaint, renderGames } from './renderers.js';
 
 export const apps = {
   explorer: { title: 'Datei-Explorer', subtitle: 'Start > Dieser PC', icon: ICONS.explorer, width: 980, height: 640, x: 120, y: 70, render: renderExplorer },
@@ -9,9 +9,10 @@ export const apps = {
   browser: { title: 'Microsoft Edge', subtitle: 'Startseite', icon: ICONS.browser, width: 1000, height: 690, x: 150, y: 60, render: renderBrowser },
   terminal: { title: 'Terminal', subtitle: 'PowerShell', icon: ICONS.terminal, width: 780, height: 520, x: 250, y: 150, render: renderTerminal },
   paint: { title: 'Paint', subtitle: 'Zeichnen · Schnelles Skizzieren', icon: ICONS.paint, width: 980, height: 700, x: 180, y: 70, render: renderPaint },
+  games: { title: 'Spiele', subtitle: 'Mini-Games · Memory & Klick-Rush', icon: ICONS.games, width: 920, height: 640, x: 220, y: 80, render: renderGames },
   widgets: { title: 'Widgets', subtitle: 'Personalisierte Übersicht', icon: ICONS.widgets, width: 860, height: 600, x: 200, y: 90, render: renderWidgets },
   recycle: { title: 'Papierkorb', subtitle: 'Zuletzt entfernt', icon: ICONS.recycle, width: 720, height: 500, x: 260, y: 120, render: renderRecycle }
 };
 
-export const pinnedApps = ['explorer','browser','paint','settings','notes','calc','terminal','widgets'];
-export const taskbarApps = ['explorer','browser','paint','settings','notes','calc','terminal','widgets'];
+export const pinnedApps = ['explorer','browser','paint','games','settings','notes','calc','terminal','widgets'];
+export const taskbarApps = ['explorer','browser','paint','games','settings','notes','calc','terminal','widgets'];

@@ -4,7 +4,7 @@ import { bootTaskbar } from './taskbar.js';
 import { renderPinned, renderQuick, renderNotifications, initPanels } from './panels.js';
 import { initSelectionBox } from './selection.js';
 import { initInteractions } from './interactions.js';
-import { initDesktopIcons } from './desktop-icons.js';
+import { initDesktopIcons } from './desktop-icons.js?v=20260528';
 import { openApp } from './window-manager.js';
 import { notify } from './utils.js';
 

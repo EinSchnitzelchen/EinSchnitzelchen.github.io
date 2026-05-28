@@ -7,3 +7,4 @@ export { renderTerminal } from './apps/terminal.js';
 export { renderWidgets } from './apps/widgets.js';
 export { renderRecycle } from './apps/recycle.js';
 export { renderPaint } from './apps/paint.js';
+export { renderGames } from './apps/games.js';

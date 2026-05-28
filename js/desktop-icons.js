@@ -4,6 +4,7 @@ import { openApp } from './window-manager.js';
 
 const GRID_SIZE = 104; // Snap to icon size (harsh grid)
 const ICON_SIZE = 104; // Icon + gap spacing
+const ICON_WIDTH = 96; // Approximate icon width used for viewport bounds
 
 export function initDesktopIcons() {
   const iconsContainer = dom.desktopShell.querySelector('.desktop-icons');
@@ -15,10 +16,10 @@ export function initDesktopIcons() {
   // Initialize positions for each icon
   icons.forEach((icon, index) => {
     const app = icon.dataset.open;
-    
+
     // Set up absolute positioning
     icon.style.position = 'absolute';
-    
+
     // Restore saved position if exists
     if (state.desktopIconPositions[app]) {
       icon.style.left = state.desktopIconPositions[app].left + 'px';
@@ -30,6 +31,11 @@ export function initDesktopIcons() {
       icon.style.top = top + 'px';
       state.desktopIconPositions[app] = { left, top };
     }
+  });
+
+  icons.forEach((icon) => {
+    const app = icon.dataset.open;
+    normalizeIconPosition(icon, app);
   });
   
   // Setup drag and select for each icon
@@ -46,6 +52,55 @@ export function initDesktopIcons() {
   
   function snapToGrid(value) {
     return Math.round(value / GRID_SIZE) * GRID_SIZE;
+  }
+
+  function getOccupiedPositions(excludeApp = null) {
+    const occupied = new Set();
+
+    icons.forEach((icon) => {
+      const app = icon.dataset.open;
+      if (excludeApp && app === excludeApp) return;
+
+      const left = snapToGrid(parseFloat(icon.style.left) || 0);
+      const top = snapToGrid(parseFloat(icon.style.top) || 0);
+      occupied.add(`${left},${top}`);
+    });
+
+    return occupied;
+  }
+
+  function findFreePosition(targetLeft, targetTop, excludeApp = null) {
+    let left = snapToGrid(targetLeft);
+    let top = snapToGrid(targetTop);
+    const occupied = getOccupiedPositions(excludeApp);
+    let attempts = 0;
+
+    while (occupied.has(`${left},${top}`) && attempts < 200) {
+      left += GRID_SIZE;
+      if (left + ICON_WIDTH > window.innerWidth - 24) {
+        left = 0;
+        top += GRID_SIZE;
+      }
+      attempts += 1;
+    }
+
+    return {
+      left: Math.max(0, left),
+      top: Math.max(0, top)
+    };
+  }
+
+  function normalizeIconPosition(icon, app, force = false) {
+    const currentLeft = parseFloat(icon.style.left) || 0;
+    const currentTop = parseFloat(icon.style.top) || 0;
+    const freePosition = findFreePosition(currentLeft, currentTop, force ? null : app);
+
+    icon.style.left = freePosition.left + 'px';
+    icon.style.top = freePosition.top + 'px';
+    state.desktopIconPositions[app] = {
+      left: freePosition.left,
+      top: freePosition.top
+    };
   }
   
   function handleIconMouseDown(e, icon, allIcons, app) {
@@ -108,21 +163,25 @@ export function initDesktopIcons() {
       
       if (hasMoved) {
         // Snap all selected icons to grid and save positions
-        state.selectedDesktopIcons.forEach(selectedApp => {
+        const selectedApps = Array.from(state.selectedDesktopIcons);
+
+        selectedApps.forEach((selectedApp) => {
           const selectedIcon = iconsContainer.querySelector(`[data-open="${selectedApp}"]`);
           const snappedLeft = snapToGrid(parseFloat(selectedIcon.style.left));
           const snappedTop = snapToGrid(parseFloat(selectedIcon.style.top));
-          
-          selectedIcon.style.left = snappedLeft + 'px';
-          selectedIcon.style.top = snappedTop + 'px';
-          
+          const freePosition = findFreePosition(snappedLeft, snappedTop, selectedApp);
+
+          selectedIcon.style.left = freePosition.left + 'px';
+          selectedIcon.style.top = freePosition.top + 'px';
+
           state.desktopIconPositions[selectedApp] = {
-            left: snappedLeft,
-            top: snappedTop
+            left: freePosition.left,
+            top: freePosition.top
           };
           delete selectedIcon.dataset.startLeft;
           delete selectedIcon.dataset.startTop;
         });
+
         localStorage.setItem('desktopIconPositions', JSON.stringify(state.desktopIconPositions));
       }
       
