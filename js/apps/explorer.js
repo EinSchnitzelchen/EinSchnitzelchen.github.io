@@ -1,138 +1,14 @@
+import { createFolder as createFsFolder, getCurrentFolder, getRootFolders, listFolder, moveItem, openFile } from '../filesystem.js';
+
 const QUICK_ACCESS = ['Start', 'Desktop', 'Dokumente', 'Downloads', 'Bilder'];
 const DRIVES = ['Windows (C:)', 'Daten (D:)'];
-
-const explorerData = {
-  Start: {
-    title: 'Start',
-    icon: '🏠',
-    type: 'folder',
-    canCreateFolder: false,
-    items: [
-      { name: 'Projektplan.docx', type: 'Word-Dokument', icon: '📄' },
-      { name: 'Rechnung-April.pdf', type: 'PDF', icon: '🧾' },
-      { name: 'Screenshots', type: 'Ordner', icon: '🗂️', children: [
-        { name: 'Screenshot-1.png', type: 'Bild', icon: '🖼️' },
-        { name: 'Screenshot-2.png', type: 'Bild', icon: '🖼️' }
-      ]},
-      { name: 'Designs.fig', type: 'Figma-Datei', icon: '🎨' },
-      { name: 'Urlaub.jpg', type: 'Bild', icon: '🖼️' },
-      { name: 'Musik', type: 'Ordner', icon: '🎵', children: [
-        { name: 'Playlist.m3u', type: 'M3U-Datei', icon: '🎶' }
-      ] },
-      { name: 'Setup.exe', type: 'Anwendung', icon: '🧩' },
-      { name: 'Archiv.zip', type: 'ZIP-Archiv', icon: '🗜️' }
-    ]
-  },
-  Desktop: {
-    title: 'Desktop',
-    icon: '🖥️',
-    type: 'folder',
-    canCreateFolder: false,
-    items: [
-      { name: 'Arbeitsbereich', type: 'Ordner', icon: '🗂️', children: [
-        { name: 'Meeting-Notizen.txt', type: 'Textdatei', icon: '📄' }
-      ] },
-      { name: 'Webdesign', type: 'Ordner', icon: '🗂️', children: [
-        { name: 'Startseite.psd', type: 'Photoshop-Datei', icon: '🖌️' }
-      ] },
-      { name: 'Kürzlich geöffnet', type: 'Ordner', icon: '🕑', children: [] },
-      { name: 'Browser-Verknüpfung.lnk', type: 'Verknüpfung', icon: '🔗' }
-    ]
-  },
-  Dokumente: {
-    title: 'Dokumente',
-    icon: '📄',
-    type: 'folder',
-    canCreateFolder: false,
-    items: [
-      { name: 'Bericht-2026.docx', type: 'Word-Dokument', icon: '📄' },
-      { name: 'Budget.xlsx', type: 'Excel-Tabelle', icon: '📊' },
-      { name: 'Protokoll.pdf', type: 'PDF', icon: '🧾' }
-    ]
-  },
-  Downloads: {
-    title: 'Downloads',
-    icon: '⬇️',
-    type: 'folder',
-    canCreateFolder: false,
-    items: [
-      { name: 'Installationen', type: 'Ordner', icon: '📂', children: [] },
-      { name: 'Leseliste.pdf', type: 'PDF', icon: '🧾' }
-    ]
-  },
-  Bilder: {
-    title: 'Bilder',
-    icon: '🖼️',
-    type: 'folder',
-    canCreateFolder: false,
-    items: [
-      { name: 'Urlaub', type: 'Ordner', icon: '🗂️', children: [
-        { name: 'Strand.jpg', type: 'Bild', icon: '🖼️' }
-      ] },
-      { name: 'Designs', type: 'Ordner', icon: '🗂️', children: [] }
-    ]
-  },
-  'Windows (C:)': {
-    title: 'Windows (C:)',
-    icon: '💽',
-    type: 'drive',
-    canCreateFolder: true,
-    items: [
-      { name: 'Programme', type: 'Ordner', icon: '📁', children: [
-        { name: 'AppA', type: 'Ordner', icon: '📁', children: [] }
-      ] },
-      { name: 'Users', type: 'Ordner', icon: '📁', children: [
-        { name: 'Julien', type: 'Ordner', icon: '📁', children: [
-          { name: 'Dokumente', type: 'Ordner', icon: '📁', children: [] },
-          { name: 'Bilder', type: 'Ordner', icon: '📁', children: [] }
-        ] }
-      ] },
-      { name: 'Windows', type: 'Ordner', icon: '📁', children: [] }
-    ]
-  },
-  'Daten (D:)': {
-    title: 'Daten (D:)',
-    icon: '🗄️',
-    type: 'drive',
-    canCreateFolder: true,
-    items: [
-      { name: 'Projekte', type: 'Ordner', icon: '📁', children: [
-        { name: 'Website', type: 'Ordner', icon: '📁', children: [] }
-      ] },
-      { name: 'Medien', type: 'Ordner', icon: '📁', children: [
-        { name: 'Fotos', type: 'Ordner', icon: '📁', children: [] }
-      ] }
-    ]
-  }
-};
 
 const explorerState = {
   currentPath: ['Start']
 };
 
-function findNode(path) {
-  let node = explorerData[path[0]];
-  if (!node) return null;
-
-  for (let i = 1; i < path.length; i += 1) {
-    const segment = path[i];
-    if (!node.items) return null;
-    const child = node.items.find(item => item.name === segment);
-    if (!child) return null;
-    node = {
-      title: child.name,
-      icon: child.icon,
-      type: child.children ? 'folder' : child.type,
-      canCreateFolder: Boolean(child.children),
-      items: child.children || []
-    };
-  }
-
-  return node;
-}
-
 function getCurrentNode() {
-  return findNode(explorerState.currentPath) || explorerData.Start;
+  return getCurrentFolder(explorerState.currentPath) || { title: 'Start', icon: '🏠', type: 'folder', items: listFolder(['Start']) };
 }
 
 function renderSidebar() {
@@ -140,11 +16,11 @@ function renderSidebar() {
     <aside class="sidebar">
       <h3>Schnellzugriff</h3>
       <div class="menu-list">
-        ${QUICK_ACCESS.map(folder => `<button class="menu-item" data-folder="${folder}"><span>${explorerData[folder].icon}</span><span>${folder}</span></button>`).join('')}
+        ${QUICK_ACCESS.map(folder => `<button class="menu-item" data-folder="${folder}"><span>${getRootFolders().find(entry => entry.name === folder)?.icon || '📁'}</span><span>${folder}</span></button>`).join('')}
       </div>
       <h3>Laufwerke</h3>
       <div class="menu-list">
-        ${DRIVES.map(folder => `<button class="menu-item" data-folder="${folder}"><span>${explorerData[folder].icon}</span><span>${folder}</span></button>`).join('')}
+        ${DRIVES.map(folder => `<button class="menu-item" data-folder="${folder}"><span>${getRootFolders().find(entry => entry.name === folder)?.icon || '💽'}</span><span>${folder}</span></button>`).join('')}
       </div>
     </aside>
   `;
@@ -160,10 +36,12 @@ function renderBreadcrumbs(path) {
 }
 
 function renderFileGrid(node) {
-  return node.items.map(item => {
+  const items = node.items || [];
+  return items.map(item => {
     const isFolder = Boolean(item.children);
+    const path = JSON.stringify([...explorerState.currentPath, item.name]);
     return `
-      <article class="file-card" data-item="${item.name}" data-folder="${isFolder}">
+      <article class="file-card" draggable="true" data-item="${item.name}" data-folder="${isFolder}" data-path='${path}'>
         <div class="file-thumb">${item.icon}</div>
         <div>
           <strong style="display:block;font-size:var(--text-sm)">${item.name}</strong>
@@ -208,7 +86,7 @@ function updateExplorerView(win) {
   if (pathbar) pathbar.innerHTML = renderBreadcrumbs(explorerState.currentPath);
   if (grid) grid.innerHTML = renderFileGrid(currentNode);
   if (newFolderBtn) {
-    const writable = currentNode.type === 'drive' || currentNode.canCreateFolder;
+    const writable = currentNode.type === 'drive' || currentNode.type === 'folder';
     newFolderBtn.disabled = !writable;
     newFolderBtn.textContent = writable ? 'Neuer Ordner' : 'Ordner nicht verfügbar';
   }
@@ -220,22 +98,59 @@ function setCurrentPath(win, path) {
   updateExplorerView(win);
 }
 
-function createFolder(win) {
-  const currentNode = getCurrentNode();
-  if (!(currentNode.type === 'drive' || currentNode.canCreateFolder)) return;
+function showCreateFolderDialog(win) {
+  return new Promise(resolve => {
+    const overlay = document.createElement('div');
+    overlay.className = 'folder-prompt-overlay';
+    overlay.innerHTML = `
+      <div class="folder-prompt-card">
+        <h3>Neuer Ordner</h3>
+        <p>Gib einen Namen für den neuen Ordner ein.</p>
+        <input class="folder-name-input" type="text" placeholder="Ordnername" maxlength="40" />
+        <div class="folder-prompt-actions">
+          <button class="toolbar-btn folder-prompt-cancel" type="button">Abbrechen</button>
+          <button class="toolbar-btn primary folder-prompt-confirm" type="button">Erstellen</button>
+        </div>
+      </div>`;
 
-  const name = prompt('Name des neuen Ordners');
+    const input = overlay.querySelector('.folder-name-input');
+    const cancel = overlay.querySelector('.folder-prompt-cancel');
+    const confirm = overlay.querySelector('.folder-prompt-confirm');
+
+    const close = () => {
+      overlay.remove();
+      resolve(null);
+    };
+
+    cancel.addEventListener('click', close);
+    confirm.addEventListener('click', () => {
+      const value = input.value.trim();
+      overlay.remove();
+      resolve(value || null);
+    });
+    input.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') confirm.click();
+      if (event.key === 'Escape') close();
+    });
+
+    win.appendChild(overlay);
+    setTimeout(() => input.focus(), 0);
+  });
+}
+
+async function createFolder(win) {
+  const currentNode = getCurrentNode();
+  if (!currentNode || !(currentNode.type === 'drive' || currentNode.type === 'folder')) return;
+
+  const name = await showCreateFolderDialog(win);
   if (!name) return;
 
-  const normalized = name.trim();
-  if (!normalized) return;
-
-  if (currentNode.items.some(item => item.name.toLowerCase() === normalized.toLowerCase())) {
-    alert('Ein Ordner mit diesem Namen existiert bereits.');
+  const entry = createFsFolder(explorerState.currentPath, name);
+  if (!entry) {
+    alert('Ein Ordner mit diesem Namen existiert bereits oder der Ordner kann nicht erstellt werden.');
     return;
   }
 
-  currentNode.items.push({ name: normalized, type: 'Ordner', icon: '📁', children: [] });
   updateExplorerView(win);
 }
 
@@ -248,14 +163,14 @@ export function initializeExplorer(win) {
     });
   });
 
-  win.querySelector('.toolbar-btn.new-folder')?.addEventListener('click', () => createFolder(win));
+  win.querySelector('.toolbar-btn.new-folder')?.addEventListener('click', () => { void createFolder(win); });
 
   win.querySelector('.file-grid')?.addEventListener('click', (event) => {
     const card = event.target.closest('.file-card');
     if (!card) return;
     const itemName = card.dataset.item;
     const currentNode = getCurrentNode();
-    const item = currentNode.items.find(entry => entry.name === itemName);
+    const item = (currentNode.items || []).find(entry => entry.name === itemName);
     if (!item) return;
 
     if (item.children) {
@@ -263,7 +178,41 @@ export function initializeExplorer(win) {
       return;
     }
 
+    const file = openFile([...explorerState.currentPath, item.name]);
+    if (file && file.content) {
+      alert(`${file.name}\n\n${file.content}`);
+      return;
+    }
+
     alert(`${item.name} kann in dieser Demo nicht geöffnet werden.`);
+  });
+
+  win.querySelector('.file-grid')?.addEventListener('dragstart', (event) => {
+    const card = event.target.closest('.file-card');
+    if (!card) return;
+    event.dataTransfer?.setData('application/x-mock-file', card.dataset.path || '');
+    event.dataTransfer?.setData('text/plain', card.dataset.path || '');
+  });
+
+  win.querySelector('.file-grid')?.addEventListener('dragover', (event) => {
+    if (event.dataTransfer?.types?.includes('application/x-mock-file')) {
+      event.preventDefault();
+      event.dataTransfer.dropEffect = 'move';
+    }
+  });
+
+  win.querySelector('.file-grid')?.addEventListener('drop', (event) => {
+    const raw = event.dataTransfer?.getData('application/x-mock-file');
+    if (!raw) return;
+    const sourcePath = JSON.parse(raw);
+    const targetPath = [...explorerState.currentPath];
+
+    try {
+      moveItem(sourcePath, targetPath);
+      updateExplorerView(win);
+    } catch (error) {
+      alert('Datei konnte nicht verschoben werden.');
+    }
   });
 
   win.querySelector('.pathbar')?.addEventListener('click', (event) => {

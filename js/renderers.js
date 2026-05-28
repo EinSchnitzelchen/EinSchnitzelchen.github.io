@@ -6,3 +6,4 @@ export { renderBrowser } from './apps/browser.js';
 export { renderTerminal } from './apps/terminal.js';
 export { renderWidgets } from './apps/widgets.js';
 export { renderRecycle } from './apps/recycle.js';
+export { renderPaint } from './apps/paint.js';
