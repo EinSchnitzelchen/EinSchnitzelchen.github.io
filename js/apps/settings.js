@@ -1,3 +1,5 @@
+import { toggleTheme, cycleWallpaper } from '../theme.js';
+
 export function renderSettings() {
   return `
     <div class="window-toolbar">
@@ -27,3 +29,11 @@ export function renderSettings() {
       </aside>
     </div>`;
 }
+
+export function setupSettings(win) {
+  win.querySelectorAll('[data-theme-choice]').forEach(btn => btn.addEventListener('click', () => toggleTheme(btn.dataset.themeChoice)));
+  win.querySelectorAll('.switch').forEach(sw => sw.addEventListener('click', () => sw.classList.toggle('on')));
+  const wallpaperTheme = win.querySelector('#wallpaperTheme');
+  if (wallpaperTheme) wallpaperTheme.addEventListener('click', cycleWallpaper);
+}
+
