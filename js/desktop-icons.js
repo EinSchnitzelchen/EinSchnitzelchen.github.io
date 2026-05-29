@@ -182,7 +182,7 @@ export function initDesktopIcons() {
           delete selectedIcon.dataset.startTop;
         });
 
-        localStorage.setItem('desktopIconPositions', JSON.stringify(state.desktopIconPositions));
+        persistUserSettings();
       }
       
       // Handle double-click to open

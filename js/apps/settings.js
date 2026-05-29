@@ -1,4 +1,5 @@
 import { toggleTheme, cycleWallpaper } from '../theme.js';
+import { state } from '../state.js';
 
 export function renderSettings() {
   return `
@@ -31,7 +32,20 @@ export function renderSettings() {
 }
 
 export function setupSettings(win) {
-  win.querySelectorAll('[data-theme-choice]').forEach(btn => btn.addEventListener('click', () => toggleTheme(btn.dataset.themeChoice)));
+  const themeButtons = win.querySelectorAll('[data-theme-choice]');
+  const setActiveThemeButton = () => {
+    themeButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.themeChoice === state.theme));
+  };
+
+  themeButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      toggleTheme(btn.dataset.themeChoice);
+      setActiveThemeButton();
+    });
+  });
+
+  setActiveThemeButton();
+
   win.querySelectorAll('.switch').forEach(sw => sw.addEventListener('click', () => sw.classList.toggle('on')));
   const wallpaperTheme = win.querySelector('#wallpaperTheme');
   if (wallpaperTheme) wallpaperTheme.addEventListener('click', cycleWallpaper);

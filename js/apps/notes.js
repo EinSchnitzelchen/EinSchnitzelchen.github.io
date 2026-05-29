@@ -1,4 +1,4 @@
-import { state } from '../state.js';
+import { state, persistUserSettings } from '../state.js';
 import { openFile, writeFile, createFile, getFileSystemSnapshot } from '../filesystem.js';
 
 export function renderNotes() {
@@ -310,6 +310,7 @@ export function setupNotes(win) {
     state.notes = textarea.value; // Sync with OS state for backward compatibility
     renderMarkdownPreview();
     updateStatusBar();
+    persistUserSettings();
   });
 
   // 7.5 Export Function (Real browser download)

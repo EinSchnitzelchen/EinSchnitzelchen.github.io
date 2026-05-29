@@ -1,5 +1,5 @@
 import { dom } from './dom.js';
-import { state } from './state.js';
+import { state, persistUserSettings } from './state.js';
 import { pinnedApps, apps } from './apps-config.js';
 import { openApp } from './window-manager.js';
 import { closePanels, togglePanel } from './utils.js';
@@ -35,6 +35,7 @@ export function renderQuick() {
     btn.innerHTML = `${icon}<span>${label}</span>`;
     btn.addEventListener('click', () => {
       state.quick[key] = !state.quick[key];
+      persistUserSettings();
       renderQuick();
       if (key === 'night') toggleTheme(state.quick[key] ? 'dark' : 'light');
     });
