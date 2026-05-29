@@ -1,4 +1,5 @@
 import { createFolder as createFsFolder, getCurrentFolder, getRootFolders, listFolder, moveItem, openFile } from '../filesystem.js';
+import { openApp } from '../window-manager.js';
 
 const QUICK_ACCESS = ['Start', 'Desktop', 'Dokumente', 'Downloads', 'Bilder'];
 const DRIVES = ['Windows (C:)', 'Daten (D:)'];
@@ -155,6 +156,16 @@ async function createFolder(win) {
 }
 
 export function initializeExplorer(win) {
+  // Event listener for virtual filesystem changes (refreshes Explorer view)
+  const onFsChange = () => {
+    if (!win.isConnected) {
+      document.removeEventListener('fs-change', onFsChange);
+      return;
+    }
+    updateExplorerView(win);
+  };
+  document.addEventListener('fs-change', onFsChange);
+
   win.querySelectorAll('.menu-item').forEach(item => {
     item.addEventListener('click', () => {
       const folder = item.dataset.folder;
@@ -179,7 +190,12 @@ export function initializeExplorer(win) {
     }
 
     const file = openFile([...explorerState.currentPath, item.name]);
-    if (file && file.content) {
+    if (file) {
+      // If it's a text file, open it directly in the new premium Notes app!
+      if (item.type === 'Textdatei' || item.name.endsWith('.txt') || item.name.endsWith('.md')) {
+        openApp('notes', [...explorerState.currentPath, item.name]);
+        return;
+      }
       alert(`${file.name}\n\n${file.content}`);
       return;
     }
