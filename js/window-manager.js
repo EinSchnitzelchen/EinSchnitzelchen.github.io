@@ -5,11 +5,14 @@ import { updateTaskbarState } from './taskbar.js';
 import { notify } from './utils.js';
 import { wireAppInternals } from './wiring.js';
 
-export function openApp(key) {
+export function openApp(key, args) {
   if (state.openWindows.has(key)) {
     const existing = state.openWindows.get(key);
     existing.classList.remove('hidden');
     focusWindow(existing);
+    if (args && typeof existing.openFile === 'function') {
+      existing.openFile(args);
+    }
     return existing;
   }
   const config = apps[key];
@@ -30,6 +33,9 @@ export function openApp(key) {
   updateTaskbarState(key, true);
   focusWindow(tpl);
   notify(config.title, 'Anwendung wurde geöffnet.');
+  if (args && typeof tpl.openFile === 'function') {
+    tpl.openFile(args);
+  }
   return tpl;
 }
 

@@ -27,9 +27,7 @@ const initialFileSystem = {
     icon: '🖥️',
     type: 'folder',
     items: [
-      { name: 'Arbeitsbereich', type: 'Ordner', icon: '🗂️', children: [
-        { name: 'Meeting-Notizen.txt', type: 'Textdatei', icon: '📄', content: 'Besprechungsnotizen aus dem Desktop.' }
-      ] },
+      { name: 'Arbeitsbereich', type: 'Ordner', icon: '🗂️', children: [] },
       { name: 'Webdesign', type: 'Ordner', icon: '🗂️', children: [
         { name: 'Startseite.psd', type: 'Photoshop-Datei', icon: '🖌️', content: 'Photoshop-Datei für das Mock-Dateisystem.' }
       ] },
@@ -116,6 +114,15 @@ function saveStore(store) {
 }
 
 const store = getStore();
+
+// Clean up 'Meeting-Notizen.txt' if it exists in the active store
+if (store.Desktop && store.Desktop.items) {
+  const arbeitsbereich = store.Desktop.items.find(item => item.name === 'Arbeitsbereich');
+  if (arbeitsbereich && arbeitsbereich.children) {
+    arbeitsbereich.children = arbeitsbereich.children.filter(item => item.name !== 'Meeting-Notizen.txt');
+  }
+}
+saveStore(store);
 
 function resolveNode(path) {
   if (!Array.isArray(path) || !path.length) return null;
@@ -219,6 +226,30 @@ export function openFile(path) {
   if (!item) return null;
   return { ...item, path: path.slice() };
 }
+
+export function writeFile(path, content) {
+  const item = findItem(path);
+  if (item) {
+    item.content = content;
+    saveStore(store);
+    return true;
+  }
+  return false;
+}
+
+export function createFile(parentPath, name, content = '') {
+  const folder = resolveParentFolder(parentPath);
+  if (!folder || !folder.items) return null;
+
+  const normalized = name.trim();
+  if (!normalized || folder.items.some(item => item.name.toLowerCase() === normalized.toLowerCase())) return null;
+
+  const entry = { name: normalized, type: 'Textdatei', icon: '📄', content };
+  folder.items.push(entry);
+  saveStore(store);
+  return entry;
+}
+
 
 export function resetFileSystem() {
   const fresh = clone(initialFileSystem);
