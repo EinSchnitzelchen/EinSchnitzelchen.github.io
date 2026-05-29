@@ -85,6 +85,7 @@ function attachWindowEvents(win) {
     if (win.classList.contains('maximized')) return;
     focusWindow(win);
     restoreSnappedWindow();
+    win.classList.add('dragging');
     drag = { x: e.clientX, y: e.clientY, left: parseFloat(win.style.left), top: parseFloat(win.style.top) };
     dom.snapOverlay.classList.add('active');
     updateSnapPreview(e.clientX, e.clientY);
@@ -98,6 +99,7 @@ function attachWindowEvents(win) {
   });
   header.addEventListener('pointerup', e => {
     if (!drag) return;
+    win.classList.remove('dragging');
     const zone = getSnapZone(e.clientX, e.clientY);
     dom.snapOverlay.classList.remove('active');
     updateSnapPreview();
@@ -123,10 +125,26 @@ function attachResizers(win) {
     handle.addEventListener('pointerdown', e => {
       if (win.classList.contains('maximized')) return;
       focusWindow(win);
+      
+      // Allow resizing snapped windows by restoring them to inline styles first
+      if (win.classList.contains('snapped-left') || win.classList.contains('snapped-right') || win.classList.contains('snapped-top')) {
+        const rect = win.getBoundingClientRect();
+        win.classList.remove('snapped-left', 'snapped-right', 'snapped-top');
+        Object.assign(win.style, { left: rect.left + 'px', top: Math.max(0, rect.top) + 'px', width: rect.width + 'px', height: rect.height + 'px' });
+      }
+
+      win.classList.add('resizing');
+      handle.setPointerCapture(e.pointerId);
+      
       const dir = [...handle.classList].find(c => c !== 'resizer');
       const start = { x: e.clientX, y: e.clientY, w: win.offsetWidth, h: win.offsetHeight, l: win.offsetLeft, t: win.offsetTop, dir };
       const move = ev => resizeWindow(win, start, ev.clientX, ev.clientY);
-      const up = () => { window.removeEventListener('pointermove', move); window.removeEventListener('pointerup', up); };
+      const up = (ev) => { 
+        win.classList.remove('resizing');
+        handle.releasePointerCapture(ev.pointerId);
+        window.removeEventListener('pointermove', move); 
+        window.removeEventListener('pointerup', up); 
+      };
       window.addEventListener('pointermove', move);
       window.addEventListener('pointerup', up);
       e.stopPropagation();
@@ -137,11 +155,24 @@ function attachResizers(win) {
 function resizeWindow(win, start, x, y) {
   let width = start.w, height = start.h, left = start.l, top = start.t;
   const dx = x - start.x, dy = y - start.y;
+  
   if (start.dir.includes('e')) width = Math.max(320, start.w + dx);
   if (start.dir.includes('s')) height = Math.max(260, start.h + dy);
-  if (start.dir.includes('w')) { width = Math.max(320, start.w - dx); left = start.l + dx; }
-  if (start.dir.includes('n')) { height = Math.max(260, start.h - dy); top = start.t + dy; }
-  Object.assign(win.style, { width: width + 'px', height: height + 'px', left: left + 'px', top: Math.max(0, top) + 'px' });
+  
+  if (start.dir.includes('w')) {
+    const clampedDx = Math.min(dx, start.w - 320);
+    width = start.w - clampedDx;
+    left = start.l + clampedDx;
+  }
+  
+  if (start.dir.includes('n')) {
+    let clampedDy = Math.min(dy, start.h - 260);
+    clampedDy = Math.max(clampedDy, -start.t); // Prevent top from going < 0
+    height = start.h - clampedDy;
+    top = start.t + clampedDy;
+  }
+  
+  Object.assign(win.style, { width: width + 'px', height: height + 'px', left: left + 'px', top: top + 'px' });
 }
 
 function toggleMaximize(win) {
