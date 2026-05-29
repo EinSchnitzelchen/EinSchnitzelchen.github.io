@@ -348,7 +348,10 @@ function setupGames(win) {
   };
 
   const resetRush = () => {
-    clearInterval(rushTimer);
+    if (rushTimer) {
+      clearInterval(rushTimer);
+      rushTimer = null;
+    }
     rushSeconds = 10;
     rushHits = 0;
     rushTimeEl.textContent = String(rushSeconds);
@@ -360,12 +363,16 @@ function setupGames(win) {
   };
 
   const startRush = () => {
-    resetRush();
+    if (rushTimer) {
+      clearInterval(rushTimer);
+    }
+    updateStatus('Klicke so schnell du kannst!');
     rushTimer = setInterval(() => {
       rushSeconds -= 1;
       rushTimeEl.textContent = String(Math.max(0, rushSeconds));
       if (rushSeconds <= 0) {
         clearInterval(rushTimer);
+        rushTimer = null;
         rushButton.disabled = true;
         rushButton.classList.add('disabled');
         rushButton.textContent = '⏰';
@@ -374,6 +381,17 @@ function setupGames(win) {
       }
     }, 1000);
   };
+
+  rushButton.addEventListener('click', () => {
+    if (rushSeconds <= 0) return;
+
+    if (!rushTimer) {
+      startRush();
+    }
+
+    rushHits += 1;
+    rushScoreEl.textContent = String(rushHits);
+  });
 
   actionButtons.forEach(btn => btn.addEventListener('click', () => {
     const action = btn.dataset.gameAction;
@@ -393,7 +411,6 @@ function setupGames(win) {
   renderMemory();
   resetRush();
   updateScore(0);
-  win.querySelector('[data-game-action="reset"]')?.addEventListener('click', startRush);
 }
 
 function setupCalculator(win) {
